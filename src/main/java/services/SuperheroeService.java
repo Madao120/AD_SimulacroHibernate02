@@ -1,6 +1,7 @@
 package services;
 
 import config.HibernateConfig;
+import model.Equipo;
 import model.Superheroe;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -93,6 +94,19 @@ public class SuperheroeService {
             Superheroe superheroe = session.get(Superheroe.class, id);
 
             if (superheroe != null){
+                /* Redundante, mejor como la linea después del comentasio
+                Equipo equipo = session.get(Equipo.class, superheroe.getEquipo().getId());
+                */
+
+                Equipo equipo = superheroe.getEquipo();
+
+                if (equipo != null && equipo.getSuperheroes() != null){
+                    equipo.getSuperheroes().remove(superheroe);
+
+                }
+                else {
+                    System.out.println("Hubo un error al intentar borrar el superheroe en la lista de equipo");
+                }
                 session.delete(superheroe);
                 transaction.commit();
             }
@@ -100,7 +114,6 @@ public class SuperheroeService {
                 transaction.rollback();
                 System.out.println("Parece que no se pudo borrar el/la Superheroe");
             }
-
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
         }
